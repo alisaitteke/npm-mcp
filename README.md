@@ -79,10 +79,6 @@ Once the server is connected, you can ask things like:
 - “Quality check for date-fns”
 - “Is it safe to run npx create-next-app?”
 
-## Files included for users
-
-- **`AI_USAGE.md`** — Instructions for making AI automatically use MCP tools (copy rules to your project)
-
 ## License
 
 MIT
