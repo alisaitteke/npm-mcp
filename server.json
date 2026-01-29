@@ -1,0 +1,21 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.alisaitteke/npm-mcp",
+  "description": "MCP server for npm package management, security analysis, and compatibility checking",
+  "repository": {
+    "url": "https://github.com/alisaitteke/npm-mcp",
+    "source": "github"
+  },
+  "version": "1.0.0",
+  "mcpName": "io.github.alisaitteke/npm-mcp",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "@alisaitteke/npm-mcp",
+      "version": "1.0.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}

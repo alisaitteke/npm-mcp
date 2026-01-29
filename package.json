@@ -1,0 +1,63 @@
+{
+  "name": "@alisaitteke/npm-mcp",
+  "version": "1.0.0",
+  "description": "MCP server for npm registry integration with security analysis and compatibility checking",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "npm-mcp": "bin/npm-registry-mcp.js"
+  },
+  "mcpName": "io.github.alisaitteke/npm-mcp",
+  "files": [
+    "dist",
+    "bin",
+    "README.md",
+    "server.json"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "mcp",
+    "npm",
+    "registry",
+    "security",
+    "compatibility",
+    "cursor",
+    "claude",
+    "model-context-protocol",
+    "ai"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alisaitteke/npm-mcp.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.25.3",
+    "@octokit/rest": "^22.0.1",
+    "lru-cache": "^11.2.5",
+    "p-limit": "^7.2.0",
+    "semver": "^7.6.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/node": "^25.1.0",
+    "@vitest/coverage-v8": "^4.0.18",
+    "nock": "^14.0.10",
+    "tsup": "^8.5.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.18"
+  }
+}

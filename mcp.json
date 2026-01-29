@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "npm-registry-mcp": {
+      "command": "npx",
+      "args": ["@alisaitteke/npm-mcp"]
+    }
+  }
+}
