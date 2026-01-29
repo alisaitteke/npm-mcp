@@ -6,13 +6,13 @@
     "url": "https://github.com/alisaitteke/npm-mcp",
     "source": "github"
   },
-  "version": "1.0.0",
+  "version": "0.0.1",
   "mcpName": "io.github.alisaitteke/npm-mcp",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "@alisaitteke/npm-mcp",
-      "version": "1.0.0",
+      "version": "0.0.1",
       "transport": {
         "type": "stdio"
       }
