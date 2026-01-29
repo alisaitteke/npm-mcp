@@ -1,6 +1,16 @@
+<div align="center">
+
+![NPM MCP Banner](./social_preview.png)
+
 # NPM MCP
 
-MCP server for npm: search packages, check security, compare versions, and validate compatibility. Use it from Cursor AI or Claude Desktop.
+**Model Context Protocol server for npm registry**
+
+Search packages, check security, compare versions, and validate compatibility. Use it from Cursor AI or Claude Desktop.
+
+> **Note:** This is an unofficial, community-driven MCP server and is not affiliated with or endorsed by npm, Inc.
+
+</div>
 
 ## Features
 
