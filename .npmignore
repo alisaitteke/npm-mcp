@@ -23,4 +23,7 @@ CONTRIBUTING.md
 coverage
 .taskmaster
 .idea
+app_data
+.mcpregistry_registry_token
+.mcpregistry_github_token
 
