@@ -4,8 +4,9 @@ MCP server for npm: search packages, check security, compare versions, and valid
 
 ## Features
 
+- **🔒 Auto-Security** — AI automatically checks packages before suggesting install (no user action!)
 - **Search** — Find packages with ranking and scores
-- **Details** — Versions, dependencies, download stats
+- **Details** — Versions, dependencies, download stats, deprecation status
 - **Security** — Vulnerability check and safe version tips
 - **Compatibility** — Peer dependency and version conflicts
 - **Quality** — Maintenance and community metrics
@@ -65,8 +66,15 @@ Once the server is connected, you can ask things like:
 
 ## Links
 
+- **🎯 Automatic Security Checks**: [AUTOMATIC.md](./AUTOMATIC.md) — How AI auto-checks packages (no user action needed!)
+- **Smart Prompts (Slash Commands)**: [PROMPTS.md](./PROMPTS.md) — Use `/check_before_install`, `/find_package`, `/audit_project`
+- **AI Auto-trigger Setup**: [AI_USAGE.md](./AI_USAGE.md) — Additional rules for `.cursorrules` (optional)
 - **Development** (setup, tests, architecture): [DEVELOPMENT.md](./DEVELOPMENT.md)
 - **Contributing**: [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Files included for users
+
+- **`AI_USAGE.md`** — Instructions for making AI automatically use MCP tools (copy rules to your project)
 
 ## License
 

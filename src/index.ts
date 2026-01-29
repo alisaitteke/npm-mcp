@@ -3,6 +3,10 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import {
   CallToolRequestSchema,
   ListToolsRequestSchema,
+  ListPromptsRequestSchema,
+  GetPromptRequestSchema,
+  ListResourcesRequestSchema,
+  ReadResourceRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { RegistryClient } from './registry-client.js';
 import { searchPackages } from './tools/search-packages.js';
@@ -32,6 +36,8 @@ class NpmRegistryServer {
       {
         capabilities: {
           tools: {},
+          prompts: {},
+          resources: {},
         },
       }
     );
@@ -198,6 +204,304 @@ class NpmRegistryServer {
         },
       ],
     }));
+
+    // List available prompts
+    this.server.setRequestHandler(ListPromptsRequestSchema, async () => ({
+      prompts: [
+        {
+          name: 'check_before_install',
+          description: 'Security and compatibility check before installing a package',
+          arguments: [
+            {
+              name: 'packageName',
+              description: 'Package name to check',
+              required: true,
+            },
+            {
+              name: 'version',
+              description: 'Package version (defaults to latest)',
+              required: false,
+            },
+          ],
+        },
+        {
+          name: 'find_package',
+          description: 'Find and compare packages for a specific use case',
+          arguments: [
+            {
+              name: 'useCase',
+              description: 'What you need the package for (e.g., "date library", "state management")',
+              required: true,
+            },
+          ],
+        },
+        {
+          name: 'audit_project',
+          description: 'Security audit for all dependencies in package.json',
+          arguments: [
+            {
+              name: 'dependencies',
+              description: 'JSON string of dependencies from package.json',
+              required: true,
+            },
+          ],
+        },
+      ],
+    }));
+
+    // Handle prompt requests
+    this.server.setRequestHandler(GetPromptRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+
+      switch (name) {
+        case 'check_before_install':
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: `Before installing ${args?.packageName}${args?.version ? `@${args.version}` : ''}, please:
+
+1. Use audit_security to check for vulnerabilities
+2. Use get_package_details to verify it's maintained
+3. Use check_compatibility with my current dependencies
+4. Show a clear recommendation: ✅ Safe to install or ⚠️ Issues found
+
+Format the response as:
+- Security status
+- Compatibility status
+- Recommended install command or alternative
+
+If there are any security issues or incompatibilities, explain them clearly and suggest safe alternatives.`,
+                },
+              },
+            ],
+          };
+
+        case 'find_package':
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: `I need a package for: ${args?.useCase}
+
+Please:
+1. Use search_packages to find top options
+2. For each result (max 3), check:
+   - audit_security for vulnerabilities
+   - analyze_quality for maintenance/popularity
+3. Compare and recommend the best option
+
+Show:
+- Package names with brief description
+- Security status for each
+- Quality scores
+- Final recommendation with install command`,
+                },
+              },
+            ],
+          };
+
+        case 'audit_project':
+          return {
+            messages: [
+              {
+                role: 'user',
+                content: {
+                  type: 'text',
+                  text: `Audit all dependencies for security issues.
+
+Dependencies: ${args?.dependencies}
+
+Please:
+1. Parse the dependencies JSON
+2. Run audit_security for each package
+3. Summarize findings:
+   - ✅ Packages with no issues
+   - ⚠️ Packages with vulnerabilities (show severity)
+   - 📦 Recommended updates
+
+Provide update commands for any vulnerable packages.`,
+                },
+              },
+            ],
+          };
+
+        default:
+          throw new Error(`Unknown prompt: ${name}`);
+      }
+    });
+
+    // List available resources (context for AI)
+    this.server.setRequestHandler(ListResourcesRequestSchema, async () => ({
+      resources: [
+        {
+          uri: 'npm://guidelines/security-first',
+          name: 'NPM Security Guidelines',
+          description: 'Automatic security check guidelines for npm packages',
+          mimeType: 'text/plain',
+        },
+        {
+          uri: 'npm://guidelines/install-workflow',
+          name: 'Package Installation Workflow',
+          description: 'Required steps before installing any npm package',
+          mimeType: 'text/plain',
+        },
+      ],
+    }));
+
+    // Read resource content
+    this.server.setRequestHandler(ReadResourceRequestSchema, async (request) => {
+      const uri = request.params.uri;
+
+      switch (uri) {
+        case 'npm://guidelines/security-first':
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'text/plain',
+                text: `# NPM Security-First Guidelines
+
+## CRITICAL: Before Installing ANY Package
+
+When user mentions installing, adding, or using an npm package, YOU MUST automatically:
+
+1. **Security Check** (MANDATORY)
+   - Run audit_security on the package
+   - Check for known vulnerabilities
+   - Verify safe versions exist
+
+2. **Compatibility Check** (MANDATORY)
+   - Run check_compatibility with user's dependencies
+   - Look for peer dependency conflicts
+   - Verify version compatibility
+
+3. **Quality Assessment** (RECOMMENDED)
+   - Check package maintenance status
+   - Verify recent updates
+   - Consider download stats
+
+## Auto-Trigger Patterns
+
+Automatically run checks when user says:
+- "install X" or "add X package"
+- "I need X" or "use X library"
+- "npm install", "yarn add", "pnpm add"
+- Imports/requires new package in code
+- Mentions package name in context of adding to project
+
+## Response Format
+
+Always respond with:
+✅ SAFE or ⚠️ WARNING
+- Security status
+- Compatibility status
+- Recommended command
+
+## Example
+
+User: "I need axios for API calls"
+You: 
+1. audit_security("axios")
+2. check_compatibility("axios", project_deps)
+3. Response: "✅ axios@1.6.0 is safe. No vulnerabilities. npm install axios@1.6.0"
+
+NEVER suggest installing without checking security first!`,
+              },
+            ],
+          };
+
+        case 'npm://guidelines/install-workflow':
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'text/plain',
+                text: `# Package Installation Workflow
+
+## Automatic Detection
+
+When user message contains package-related keywords, automatically execute this workflow:
+
+### Keywords that trigger workflow:
+- Package names (express, react, lodash, etc.)
+- "install", "add", "use", "need"
+- "npm", "yarn", "pnpm"
+- "library", "package", "dependency"
+- Import/require statements with new packages
+
+### Workflow Steps
+
+1. **Extract Package Name**
+   - From user message or code
+   - Handle @scoped/packages
+   - Handle version specs (package@version)
+
+2. **Run Security Audit**
+   \`\`\`
+   audit_security(packageName, version?)
+   \`\`\`
+   - Check for CVEs
+   - Get severity levels
+   - Find safe versions
+
+3. **Check Compatibility**
+   \`\`\`
+   check_compatibility(packageName, version, existingDeps)
+   \`\`\`
+   - Verify peer dependencies
+   - Check for conflicts
+   - Validate version ranges
+
+4. **Get Package Details**
+   \`\`\`
+   get_package_details(packageName)
+   \`\`\`
+   - Check deprecation status
+   - Verify maintenance
+   - Get latest version
+
+5. **Generate Recommendation**
+   - ✅ Safe: Provide install command
+   - ⚠️ Issues: Explain problems + suggest fix
+   - 🚫 Unsafe: Recommend alternatives
+
+### Example Execution
+
+User: "Let me install lodash for utilities"
+
+Auto-execute:
+\`\`\`javascript
+// Step 1: Security
+const security = await audit_security("lodash");
+// Step 2: Compatibility  
+const compat = await check_compatibility("lodash", "^4.17.21", projectDeps);
+// Step 3: Details
+const details = await get_package_details("lodash");
+\`\`\`
+
+Response:
+"⚠️ lodash@4.17.20 has security issues. Use lodash@4.17.21 instead.
+npm install lodash@4.17.21"
+
+### Never Skip
+
+- NEVER suggest npm install without audit_security
+- NEVER ignore peer dependency warnings
+- NEVER recommend deprecated packages
+- ALWAYS provide specific version in command`,
+              },
+            ],
+          };
+
+        default:
+          throw new Error(`Unknown resource: ${uri}`);
+      }
+    });
 
     // Handle tool calls
     this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
