@@ -79,20 +79,6 @@ Once the server is connected, you can ask things like:
 - “Quality check for date-fns”
 - “Is it safe to run npx create-next-app?”
 
-## Links
-
-- **MCP Capabilities**: [MCP_CAPABILITIES.md](./MCP_CAPABILITIES.md) — What this MCP ACTUALLY does (NOT just metadata!)
-- **Developer Productivity**: [PRODUCTIVITY.md](./PRODUCTIVITY.md) — Quick start, comparison, bundle size, alternatives
-- **Package Capabilities**: [CAPABILITIES.md](./CAPABILITIES.md) — ESM/CJS, TypeScript, Platform support analysis
-- **Automatic Security Checks**: [AUTOMATIC.md](./AUTOMATIC.md) — How AI auto-checks packages (no user action needed!)
-- **Web Search Fallback**: [WEB_FALLBACK.md](./WEB_FALLBACK.md) — Auto-correction when AI uses web search
-- **Tool Descriptions**: [TOOL_DESCRIPTIONS.md](./TOOL_DESCRIPTIONS.md) — How AI knows when to use MCP
-- **Smart Prompts (Slash Commands)**: [PROMPTS.md](./PROMPTS.md) — Use `/check_before_install`, `/find_package`, `/audit_project`
-- **Testing Guide**: [TESTING.md](./TESTING.md) — Verify automatic triggers work correctly
-- **AI Auto-trigger Setup**: [AI_USAGE.md](./AI_USAGE.md) — Additional rules for `.cursorrules` (optional)
-- **Development** (setup, tests, architecture): [DEVELOPMENT.md](./DEVELOPMENT.md)
-- **Contributing**: [CONTRIBUTING.md](./CONTRIBUTING.md)
-
 ## Files included for users
 
 - **`AI_USAGE.md`** — Instructions for making AI automatically use MCP tools (copy rules to your project)
