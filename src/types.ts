@@ -57,6 +57,8 @@ export interface PackageVersion {
   bugs?: { url?: string };
   keywords?: string[];
   engines?: Record<string, string>;
+  /** Deprecation message when set by maintainer (string or true) */
+  deprecated?: string | true;
 }
 
 // Person type for author/maintainer

@@ -74,6 +74,14 @@ export async function getPackageDetails(
       publishedAt: packument.time[v],
     }));
 
+    // Deprecation: npm packument includes deprecated on version
+    const deprecated =
+      'deprecated' in versionData && versionData.deprecated !== undefined
+        ? versionData.deprecated === true
+          ? 'This version is deprecated.'
+          : String(versionData.deprecated)
+        : null;
+
     // Build comprehensive response
     const details = {
       success: true,
@@ -82,6 +90,7 @@ export async function getPackageDetails(
         version: versionData.version,
         description: versionData.description || packument.description,
         isLatest: targetVersion === packument['dist-tags'].latest,
+        deprecated,
       },
       metadata: {
         license: versionData.license || packument.license || 'Unknown',
@@ -97,6 +106,13 @@ export async function getPackageDetails(
         tags: packument['dist-tags'],
         total: allVersions.length,
         recent: recentVersions,
+        deprecatedVersions: Object.entries(packument.versions)
+          .filter(([, v]) => v.deprecated !== undefined)
+          .map(([v, data]) => ({
+            version: v,
+            message:
+              data.deprecated === true ? 'Deprecated' : String(data.deprecated),
+          })),
       },
       dependencies: {
         dependencies: versionData.dependencies || {},
