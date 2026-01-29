@@ -1,7 +1,7 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.alisaitteke/npm-mcp",
-  "description": "MCP server for npm package management, security analysis, and compatibility checking",
+  "description": "Discover, compare, and analyze npm packages with AI-generated recommendations. NOT just metadata - this MCP actively compares packages, generates pros/cons analysis, scores alternatives, and provides 'which is better?' recommendations. Perfect for: 'what packages exist?', 'which is better: X or Y?', 'what are pros/cons?', 'when to use A vs B?' questions. Combines npm registry data with intelligent analysis.",
   "repository": {
     "url": "https://github.com/alisaitteke/npm-mcp",
     "source": "github"

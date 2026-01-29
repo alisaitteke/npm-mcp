@@ -8,6 +8,8 @@ This MCP automatically injects security guidelines into AI context, making check
 
 When this MCP connects, it automatically provides these resources to AI:
 
+- **`npm://guidelines/search-first`** — NEVER use web search for npm packages, ALWAYS use MCP tools
+- **`npm://guidelines/validate-web-results`** — If web search returns npm packages, re-do with MCP
 - **`npm://guidelines/security-first`** — Security-first rules + Cursor Agent autonomous mode instructions
 - **`npm://guidelines/install-workflow`** — Auto-check workflow
 - **`npm://watch/package-json`** — Package.json change detection instructions
@@ -16,9 +18,18 @@ AI reads these **automatically** and follows the guidelines.
 
 ### 2. **Trigger Patterns**
 
-AI automatically runs security checks when it detects:
+AI automatically runs MCP tools when it detects:
 
-**User prompts:**
+**Package search prompts:**
+```
+User: "Search for React state management libraries"
+User: "Find date libraries"
+User: "Best HTTP client"
+User: "Compare axios vs node-fetch"
+User: "Alternatives to moment.js"
+```
+
+**Installation prompts:**
 ```
 User: "install express"
 User: "I need axios for API"
@@ -36,7 +47,9 @@ Agent fixing code → requires new package
 ```
 
 **Any mention of:**
-- Package names (express, react, lodash...)
+- Search: "search", "find", "discover", "look for", "best", "top"
+- Compare: "compare", "vs", "or", "better", "alternative"
+- Package names: express, react, lodash...
 - Keywords: install, add, use, need, require
 - Commands: npm install, yarn add, pnpm add
 - Code: import/require with new packages
@@ -44,8 +57,28 @@ Agent fixing code → requires new package
 
 ### 3. **Auto-Execution Flow**
 
+**Example 1: Package Search**
 ```
-User prompt: "nodejs ile örnek bir api isteği hazırla"
+User: "Search for React state management libraries"
+
+AI automatically:
+1. search_packages("react state management")  ← Uses MCP, NOT web!
+2. compare_packages(top 3 results)
+3. analyze_bundle_size(each)
+4. Response with comparison
+
+"Top React state management libraries:
+
+1. zustand (12KB) - Minimal, fast
+2. jotai (5KB) - Atomic state
+3. redux (16KB) - Standard, popular
+
+Recommendation: zustand for simplicity"
+```
+
+**Example 2: API Request**
+```
+User: "nodejs ile örnek bir api isteği hazırla"
 
 AI detects: "API request" → needs a package (axios, node-fetch, etc.)
 
@@ -53,11 +86,20 @@ AI automatically:
 1. search_packages("http client node")
 2. audit_security("axios")  ← Automatic!
 3. check_compatibility("axios", project_deps)
-4. Response with safe version
+4. generate_quick_start("axios")
+5. Response with safe version + code
 
 "For API requests, I recommend axios.
 ✅ No vulnerabilities
 ✅ Compatible with your project
+
+```typescript
+import axios from 'axios';
+
+const response = await axios.get('https://api.example.com');
+console.log(response.data);
+```
+
 npm install axios@1.6.0"
 ```
 
@@ -72,6 +114,26 @@ AI just **automatically** checks because:
 - MCP resources provide the guidelines
 - AI follows them for every package mention
 - Happens in background, transparent to user
+
+### 5. **Web Search Fallback Protection**
+
+Even if AI uses web search by mistake:
+
+```
+AI uses web search → finds "axios", "lodash" in results
+
+AI detects: These are npm packages!
+
+AI automatically:
+1. Extracts package names
+2. Calls search_packages()
+3. Calls compare_packages()
+4. Re-generates response with MCP data
+
+User sees: Accurate npm registry data, not web results
+```
+
+This is "self-correction" - AI catches itself and fixes it!
 
 ## Example Scenarios
 
