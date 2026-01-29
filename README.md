@@ -4,12 +4,12 @@ MCP server for npm: search packages, check security, compare versions, and valid
 
 ## Features
 
-- **🔒 Auto-Security** — AI automatically checks packages before suggesting install (no user action!)
-- **🎯 Capabilities Analysis** — ESM/CJS, TypeScript, Platform support (Node/Browser/Deno), Build tools
-- **🚀 Quick Start Generator** — Ready-to-use code examples for any package
-- **⚖️ Package Comparison** — Compare alternatives side-by-side (features, size, popularity)
-- **📦 Bundle Size Analysis** — Minified/gzipped sizes, tree-shaking, impact on your bundle
-- **🔍 Similar Packages** — Find alternatives and similar packages
+- **Auto-Security** — AI automatically checks packages before suggesting install (no user action!)
+- **Capabilities Analysis** — ESM/CJS, TypeScript, Platform support (Node/Browser/Deno), Build tools
+- **Quick Start Generator** — Ready-to-use code examples for any package
+- **Package Comparison** — Compare alternatives side-by-side (features, size, popularity)
+- **Bundle Size Analysis** — Minified/gzipped sizes, tree-shaking, impact on your bundle
+- **Similar Packages** — Find alternatives and similar packages
 - **Search** — Find packages with ranking and scores
 - **Details** — Versions, dependencies, download stats, deprecation status
 - **Security** — Vulnerability check and safe version tips
@@ -71,9 +71,9 @@ Once the server is connected, you can ask things like:
 
 ## Links
 
-- **🚀 Developer Productivity**: [PRODUCTIVITY.md](./PRODUCTIVITY.md) — Quick start, comparison, bundle size, alternatives
-- **🎯 Package Capabilities**: [CAPABILITIES.md](./CAPABILITIES.md) — ESM/CJS, TypeScript, Platform support analysis
-- **🎯 Automatic Security Checks**: [AUTOMATIC.md](./AUTOMATIC.md) — How AI auto-checks packages (no user action needed!)
+- **Developer Productivity**: [PRODUCTIVITY.md](./PRODUCTIVITY.md) — Quick start, comparison, bundle size, alternatives
+- **Package Capabilities**: [CAPABILITIES.md](./CAPABILITIES.md) — ESM/CJS, TypeScript, Platform support analysis
+- **Automatic Security Checks**: [AUTOMATIC.md](./AUTOMATIC.md) — How AI auto-checks packages (no user action needed!)
 - **Smart Prompts (Slash Commands)**: [PROMPTS.md](./PROMPTS.md) — Use `/check_before_install`, `/find_package`, `/audit_project`
 - **AI Auto-trigger Setup**: [AI_USAGE.md](./AI_USAGE.md) — Additional rules for `.cursorrules` (optional)
 - **Development** (setup, tests, architecture): [DEVELOPMENT.md](./DEVELOPMENT.md)
