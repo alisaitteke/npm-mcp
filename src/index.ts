@@ -1,3 +1,10 @@
+/*
+ *
+ *  * Copyright © 2026 Ali Sait Teke
+ *  * All rights reserved.
+ *
+ */
+
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import {
@@ -21,6 +28,10 @@ import { auditSecurity } from './tools/security-audit.js';
 import { analyzeQuality } from './tools/quality-analysis.js';
 import { analyzeNpxCommand } from './tools/npx-command.js';
 import { analyzeCapabilities } from './tools/package-capabilities.js';
+import { generateQuickStart } from './tools/quick-start.js';
+import { comparePackages } from './tools/compare-packages.js';
+import { analyzeBundleSize } from './tools/bundle-size.js';
+import { findSimilarPackages } from './tools/similar-packages.js';
 
 /**
  * NPM Registry MCP Server
@@ -220,6 +231,87 @@ class NpmRegistryServer {
               version: {
                 type: 'string',
                 description: 'Specific version (optional, defaults to latest)',
+              },
+            },
+            required: ['packageName'],
+          },
+        },
+        {
+          name: 'generate_quick_start',
+          description:
+            'Generate ready-to-use code examples for a package (installation, basic usage, framework-specific examples)',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              packageName: {
+                type: 'string',
+                description: 'Name of the package',
+              },
+              version: {
+                type: 'string',
+                description: 'Specific version (optional)',
+              },
+              framework: {
+                type: 'string',
+                enum: ['vanilla', 'react', 'vue', 'svelte', 'express', 'fastify', 'next', 'auto'],
+                description: 'Target framework (auto-detect if not specified)',
+              },
+            },
+            required: ['packageName'],
+          },
+        },
+        {
+          name: 'compare_packages',
+          description:
+            'Compare multiple packages side-by-side (features, size, popularity, maintenance, TypeScript support)',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              packages: {
+                type: 'array',
+                items: { type: 'string' },
+                description: 'Array of package names to compare (2-5 packages)',
+                minItems: 2,
+                maxItems: 5,
+              },
+            },
+            required: ['packages'],
+          },
+        },
+        {
+          name: 'analyze_bundle_size',
+          description:
+            'Analyze bundle size impact: minified, gzipped sizes, tree-shaking support, recommendations',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              packageName: {
+                type: 'string',
+                description: 'Name of the package',
+              },
+              version: {
+                type: 'string',
+                description: 'Specific version (optional)',
+              },
+            },
+            required: ['packageName'],
+          },
+        },
+        {
+          name: 'find_similar_packages',
+          description:
+            'Find similar/alternative packages based on keywords and functionality',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              packageName: {
+                type: 'string',
+                description: 'Name of the package to find alternatives for',
+              },
+              limit: {
+                type: 'number',
+                description: 'Number of results (default: 5, max: 10)',
+                default: 5,
               },
             },
             required: ['packageName'],
@@ -581,13 +673,13 @@ npm install lodash@4.17.21"
     this.server.setRequestHandler(SubscribeRequestSchema, async (request) => {
       const { uri } = request.params;
       this.subscriptions.add(uri);
-      
+
       // Send immediate notification about current state
       if (uri === 'npm://watch/package-json') {
         // Client subscribed to package.json monitoring
         // They'll get notified when package.json changes
       }
-      
+
       return {};
     });
 
@@ -620,6 +712,14 @@ npm install lodash@4.17.21"
             return await this.handleCompareVersions(args);
           case 'analyze_capabilities':
             return await this.handleAnalyzeCapabilities(args);
+          case 'generate_quick_start':
+            return await this.handleGenerateQuickStart(args);
+          case 'compare_packages':
+            return await this.handleComparePackages(args);
+          case 'analyze_bundle_size':
+            return await this.handleAnalyzeBundleSize(args);
+          case 'find_similar_packages':
+            return await this.handleFindSimilarPackages(args);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -726,6 +826,54 @@ npm install lodash@4.17.21"
 
   private async handleAnalyzeCapabilities(args: any) {
     const result = await analyzeCapabilities(args, this.registryClient);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result,
+        },
+      ],
+    };
+  }
+
+  private async handleGenerateQuickStart(args: any) {
+    const result = await generateQuickStart(args, this.registryClient);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result,
+        },
+      ],
+    };
+  }
+
+  private async handleComparePackages(args: any) {
+    const result = await comparePackages(args, this.registryClient);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result,
+        },
+      ],
+    };
+  }
+
+  private async handleAnalyzeBundleSize(args: any) {
+    const result = await analyzeBundleSize(args, this.registryClient);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result,
+        },
+      ],
+    };
+  }
+
+  private async handleFindSimilarPackages(args: any) {
+    const result = await findSimilarPackages(args, this.registryClient);
     return {
       content: [
         {
