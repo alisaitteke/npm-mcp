@@ -99,6 +99,20 @@ MIT
 
 ## Contributors
 
-Thanks to everyone who helps improve this project.
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/alisaitteke">
+        <img src="https://github.com/alisaitteke.png" width="100px;" alt="Ali Sait Teke"/>
+        <br />
+        <sub><b>Ali Sait Teke</b></sub>
+      </a>
+      <br />
+      <sub>Creator & Maintainer</sub>
+    </td>
+  </tr>
+</table>
+
+Thanks to everyone who helps improve this project!
 
 [![Contributors](https://img.shields.io/github/contributors/alisaitteke/npm-mcp?style=flat-square)](https://github.com/alisaitteke/npm-mcp/graphs/contributors)
