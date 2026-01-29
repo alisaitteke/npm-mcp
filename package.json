@@ -1,6 +1,6 @@
 {
   "name": "@alisaitteke/npm-mcp",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "MCP server for npm registry integration with security analysis and compatibility checking",
   "type": "module",
   "main": "dist/index.js",
