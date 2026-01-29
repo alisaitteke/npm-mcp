@@ -8,8 +8,9 @@ This MCP automatically injects security guidelines into AI context, making check
 
 When this MCP connects, it automatically provides these resources to AI:
 
-- **`npm://guidelines/security-first`** — Security-first rules
+- **`npm://guidelines/security-first`** — Security-first rules + Cursor Agent autonomous mode instructions
 - **`npm://guidelines/install-workflow`** — Auto-check workflow
+- **`npm://watch/package-json`** — Package.json change detection instructions
 
 AI reads these **automatically** and follows the guidelines.
 
@@ -17,6 +18,7 @@ AI reads these **automatically** and follows the guidelines.
 
 AI automatically runs security checks when it detects:
 
+**User prompts:**
 ```
 User: "install express"
 User: "I need axios for API"
@@ -25,11 +27,20 @@ User: "use react-query"
 User: "npm install typescript"
 ```
 
+**Cursor Agent autonomous actions:**
+```
+Agent writing code → adds import axios
+Agent creating project → generates package.json
+Agent adding feature → installs new dependency
+Agent fixing code → requires new package
+```
+
 **Any mention of:**
 - Package names (express, react, lodash...)
 - Keywords: install, add, use, need, require
 - Commands: npm install, yarn add, pnpm add
 - Code: import/require with new packages
+- File changes: package.json modifications
 
 ### 3. **Auto-Execution Flow**
 
@@ -103,6 +114,42 @@ AI (automatically):
 5. Recommends safest + provides code
 ```
 
+### Scenario 4: Cursor Agent Autonomous Mode (NEW!)
+
+```
+User: "Build a REST API with authentication"
+
+Cursor Agent (autonomous, no user prompts):
+1. Generates project structure
+2. About to add: express, jsonwebtoken, bcrypt
+3. MCP resource tells it: "Check security first!"
+4. Agent automatically:
+   - audit_security("express")
+   - audit_security("jsonwebtoken")
+   - audit_security("bcrypt")
+5. Finds: bcrypt has vulnerability
+6. Agent switches to bcryptjs (safer)
+7. Creates package.json with safe versions
+8. User never sees the security check - it just works!
+```
+
+### Scenario 5: Package.json Auto-Generation
+
+```
+User: "Initialize a Node.js TypeScript project"
+
+Cursor Agent:
+1. About to write package.json
+2. Needs: typescript, @types/node, ts-node
+3. MCP detects: new dependency addition
+4. Agent automatically audits each package
+5. Uses latest safe versions
+6. Generates package.json with:
+   "typescript": "5.3.3" (checked ✅)
+   "@types/node": "20.10.0" (checked ✅)
+   "ts-node": "10.9.2" (checked ✅)
+```
+
 ## Why This Works
 
 ### Traditional Approach (Manual)
@@ -114,6 +161,15 @@ AI: "Sure, run: npm install axios"
 ❌ Risk of vulnerabilities
 ```
 
+### Traditional Autonomous Agent
+```
+User: "Build API"
+Cursor Agent: Writes code, adds express@4.17.1 to package.json
+❌ Might use outdated version
+❌ No security validation
+❌ Potential vulnerabilities
+```
+
 ### With MCP Resources (Automatic)
 ```
 User: "I want axios"
@@ -123,6 +179,18 @@ AI: "✅ axios@1.6.0 is safe. npm install axios@1.6.0"
 ✅ Automatic security
 ✅ Safe version ensured
 ✅ Zero user effort
+```
+
+### With MCP Resources + Autonomous Agent (NEW!)
+```
+User: "Build API"
+Cursor Agent starts writing code
+Agent reads resource: "Check security before adding packages"
+Agent: Automatically audits express, jsonwebtoken, etc.
+Agent: Uses safe versions in package.json
+✅ Autonomous + Secure
+✅ No user intervention
+✅ Best of both worlds
 ```
 
 ## Configuration
@@ -222,20 +290,36 @@ AI reads this once at startup and follows it for every interaction.
 
 **User**: "nodejs ile api projesi"
 
-**AI** (thinking):
+**Cursor Agent** (autonomous mode, thinking):
 1. *Reads resource: check security first*
 2. *Detects: needs http package*
 3. *Runs: audit_security("express")*
 4. *Runs: audit_security("fastify")*
 5. *Compares*
+6. *About to write package.json*
+7. *Runs final check on all packages*
 
-**AI** (response):
-"✅ I recommend Fastify (safer, faster than Express)
-npm install fastify@4.26.0
+**Cursor Agent** (output - creates files automatically):
+```json
+// package.json
+{
+  "dependencies": {
+    "fastify": "4.26.0",  // ✅ Audited, safe
+    "pino": "8.17.2"      // ✅ Audited, safe
+  }
+}
+```
 
-Here's the code..."
+```javascript
+// server.js - Generated with safe packages
+import Fastify from 'fastify';
+// ... working code
+```
 
-**Zero manual checks. Fully automatic. Security-first by default.**
+**User sees**: Working project with secure packages
+**User never saw**: All the security audits happening in background
+
+**Zero manual checks. Fully automatic. Security-first by default. Even in autonomous mode.**
 
 ---
 

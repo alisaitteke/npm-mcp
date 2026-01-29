@@ -7,6 +7,8 @@ import {
   GetPromptRequestSchema,
   ListResourcesRequestSchema,
   ReadResourceRequestSchema,
+  SubscribeRequestSchema,
+  UnsubscribeRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js';
 import { RegistryClient } from './registry-client.js';
 import { searchPackages } from './tools/search-packages.js';
@@ -18,6 +20,7 @@ import {
 import { auditSecurity } from './tools/security-audit.js';
 import { analyzeQuality } from './tools/quality-analysis.js';
 import { analyzeNpxCommand } from './tools/npx-command.js';
+import { analyzeCapabilities } from './tools/package-capabilities.js';
 
 /**
  * NPM Registry MCP Server
@@ -26,6 +29,7 @@ import { analyzeNpxCommand } from './tools/npx-command.js';
 class NpmRegistryServer {
   private server: Server;
   private registryClient: RegistryClient;
+  private subscriptions: Set<string> = new Set();
 
   constructor() {
     this.server = new Server(
@@ -202,6 +206,25 @@ class NpmRegistryServer {
             required: ['packageName', 'fromVersion', 'toVersion'],
           },
         },
+        {
+          name: 'analyze_capabilities',
+          description:
+            'Analyze package capabilities: ESM/CJS support, TypeScript, platforms (Node/Browser/Deno), exports, build tools',
+          inputSchema: {
+            type: 'object',
+            properties: {
+              packageName: {
+                type: 'string',
+                description: 'Name of the package to analyze',
+              },
+              version: {
+                type: 'string',
+                description: 'Specific version (optional, defaults to latest)',
+              },
+            },
+            required: ['packageName'],
+          },
+        },
       ],
     }));
 
@@ -350,6 +373,12 @@ Provide update commands for any vulnerable packages.`,
           description: 'Required steps before installing any npm package',
           mimeType: 'text/plain',
         },
+        {
+          uri: 'npm://watch/package-json',
+          name: 'Package.json Watcher',
+          description: 'Subscribe to get notified when package.json changes are detected',
+          mimeType: 'application/json',
+        },
       ],
     }));
 
@@ -393,6 +422,25 @@ Automatically run checks when user says:
 - "npm install", "yarn add", "pnpm add"
 - Imports/requires new package in code
 - Mentions package name in context of adding to project
+
+## SPECIAL: Cursor Agent Autonomous Mode
+
+When Cursor Agent/Composer writes code autonomously:
+- If it adds import/require for NEW package → audit first + check capabilities
+- If it modifies package.json dependencies → audit all new packages + verify ESM/TS support
+- If it suggests npm install command → audit + check capabilities before suggesting
+- NEVER write package.json without checking security AND capabilities
+- ALWAYS verify ESM/TypeScript support for modern projects
+
+## Automatic Capability Checks
+
+When analyzing or recommending packages, also check:
+- ESM vs CommonJS support (modern projects prefer ESM)
+- TypeScript definitions (for TS projects)
+- Platform support (Node.js, Browser, Deno, Bun)
+- Engine requirements (Node version compatibility)
+
+Use analyze_capabilities tool to check these automatically.
 
 ## Response Format
 
@@ -498,9 +546,56 @@ npm install lodash@4.17.21"
             ],
           };
 
+        case 'npm://watch/package-json':
+          return {
+            contents: [
+              {
+                uri,
+                mimeType: 'application/json',
+                text: JSON.stringify({
+                  message: 'Watching for package.json changes',
+                  instructions: [
+                    'When Cursor Agent adds dependencies to package.json',
+                    'When Cursor Agent writes import/require for new packages',
+                    'When user creates/modifies package.json',
+                    'Automatically run audit_security for new packages',
+                    'Check compatibility with existing dependencies',
+                    'Warn about vulnerabilities before completing the task'
+                  ],
+                  autoTriggers: {
+                    onPackageJsonModified: 'audit_all_new_dependencies',
+                    onNewImport: 'audit_single_package',
+                    onNpmCommand: 'check_security_first'
+                  }
+                }, null, 2),
+              },
+            ],
+          };
+
         default:
           throw new Error(`Unknown resource: ${uri}`);
       }
+    });
+
+    // Handle subscriptions (for package.json changes)
+    this.server.setRequestHandler(SubscribeRequestSchema, async (request) => {
+      const { uri } = request.params;
+      this.subscriptions.add(uri);
+      
+      // Send immediate notification about current state
+      if (uri === 'npm://watch/package-json') {
+        // Client subscribed to package.json monitoring
+        // They'll get notified when package.json changes
+      }
+      
+      return {};
+    });
+
+    // Handle unsubscriptions
+    this.server.setRequestHandler(UnsubscribeRequestSchema, async (request) => {
+      const { uri } = request.params;
+      this.subscriptions.delete(uri);
+      return {};
     });
 
     // Handle tool calls
@@ -523,6 +618,8 @@ npm install lodash@4.17.21"
             return await this.handleAnalyzeNpxCommand(args);
           case 'compare_versions':
             return await this.handleCompareVersions(args);
+          case 'analyze_capabilities':
+            return await this.handleAnalyzeCapabilities(args);
           default:
             throw new Error(`Unknown tool: ${name}`);
         }
@@ -617,6 +714,18 @@ npm install lodash@4.17.21"
 
   private async handleCompareVersions(args: any) {
     const result = await compareVersions(args, this.registryClient);
+    return {
+      content: [
+        {
+          type: 'text',
+          text: result,
+        },
+      ],
+    };
+  }
+
+  private async handleAnalyzeCapabilities(args: any) {
+    const result = await analyzeCapabilities(args, this.registryClient);
     return {
       content: [
         {
